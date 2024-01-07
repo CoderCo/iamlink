@@ -1,0 +1,6 @@
+/venv
+.env
+__pycache__
+url_project/__pycache__
+url/__pycache__
+.env.dev

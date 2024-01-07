@@ -1,0 +1,28 @@
+<div class="urls mt-10 mx-auto max-w-2xl">
+    <!-- Display URLs in a Table -->
+    <table class="min-w-full divide-y divide-gray-200">
+        <thead class="bg-gray-50">
+        <tr>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Сокращенная ссылка
+            </th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Оригинальная ссылка
+            </th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Просмотры
+            </th>
+        </tr>
+        </thead>
+        <tbody class="bg-white divide-y divide-gray-200">
+        <!-- JINJA USED TO LOOP OVER URLS SENT TO TEMPLATE BY VIEW FUNCTION -->
+        {% for url in urls %}
+            <tr>
+                <td class="px-6 py-4 whitespace-nowrap">{{ request.get_host }}/url/{{ url.hash }}</td>
+                <td class="px-6 py-4 whitespace-nowrap">{{ url.url }}</td>
+                <td class="px-6 py-4 whitespace-nowrap">{{ url.visits }}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>

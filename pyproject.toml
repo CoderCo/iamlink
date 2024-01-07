@@ -1,0 +1,27 @@
+[tool.poetry]
+name = "koyeb-django-url-shortner"
+version = "0.1.0"
+description = ""
+authors = ["coderco <coderpydj@gmail.com>"]
+readme = "README.md"
+packages = [{include = "koyeb_django_url_shortner"}]
+
+[tool.poetry.dependencies]
+python = "^3.10"
+asgiref = "3.7.2"
+dj-database-url = "2.1.0"
+django = "4.2.7"
+djangorestframework = "3.14.0"
+gunicorn = "21.2.0"
+packaging = "23.2"
+psycopg2 = "2.9.9"
+pytz = "2023.3.post1"
+sqlparse = "0.4.4"
+typing-extensions = "4.8.0"
+django-environ = "^0.11.2"
+django-cors-headers = "^4.3.1"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
