@@ -92,4 +92,4 @@ def get_url_stats(request, hash):
     
 def simple_ui(request):
     urls = URL.objects.all()
-    return JsonResponse({"urls": urls}, status=200)
+    return render(request, "index.html", {"urls": urls})
