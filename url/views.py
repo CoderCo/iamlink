@@ -1,3 +1,5 @@
+from django.views.decorators.csrf import csrf_exempt
+
 from django.core.serializers import serialize
 from django.http import HttpResponseNotFound
 from django.shortcuts import redirect, render
@@ -23,8 +25,12 @@ def redirect_original_url(request, hash):
     except URL.DoesNotExist:
         return HttpResponseNotFound("Short URL not found")
 
+
+
 @api_view(['POST'])
 def create_short_url(request):
+    csrf_token = request.META
+    print(csrf_token, '_______________________________')
     company = None
     title = None
     if 'url' in request.data:
