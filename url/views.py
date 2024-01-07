@@ -9,14 +9,17 @@ from .serializers import URLSerializer
 from rest_framework.response import Response
 import json
 import environ
-from url_project.settings import SECRET_TOKEN, BASE_DIR
+from url_project.settings import SECRET_TOKEN, DEBUG
 
 def redirect_original_url(request, hash):
     try:
         url = URL.objects.get(hash=hash)
         url.visits += 1  # Increment visits count
         url.save()
-        return redirect(url.url)
+        print(url.url, 'url.urlurl.urlurl.urlurl.urlurl.url')
+        if DEBUG:
+            return redirect(f'http://{url.url}')
+        return redirect(f'https://{url.url}')
     except URL.DoesNotExist:
         return HttpResponseNotFound("Short URL not found")
 

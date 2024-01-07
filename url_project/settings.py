@@ -28,7 +28,7 @@ if READ_DOT_ENV_FILE:
     env.read_env(str(BASE_DIR / ".env.dev"))
 
 SECRET_TOKEN = env.str("SECRET_TOKEN", default='1234567890gslhkhkhctww5x6x4ryxrytxrrxrryrdfghjkl')
-
+DEBUG = env.bool("DEBUG", default=True)
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
