@@ -1,5 +1,3 @@
-from django.views.decorators.csrf import csrf_exempt
-
 from django.core.serializers import serialize
 from django.http import HttpResponseNotFound
 from django.shortcuts import redirect, render
@@ -11,26 +9,21 @@ from .serializers import URLSerializer
 from rest_framework.response import Response
 import json
 import environ
-from url_project.settings import SECRET_TOKEN, DEBUG
+from url_project.settings import SECRET_TOKEN
 
 def redirect_original_url(request, hash):
     try:
         url = URL.objects.get(hash=hash)
         url.visits += 1  # Increment visits count
         url.save()
-        print(url.url, 'url.urlurl.urlurl.urlurl.urlurl.url')
-        if DEBUG:
-            return redirect(f'http://{url.url}')
-        return redirect(f'https://{url.url}')
+        return redirect(f'http://{url.url}')
     except URL.DoesNotExist:
-        return HttpResponseNotFound("Short URL not found")
+        return HttpResponseNotFound("No Redirect")
 
 
 
 @api_view(['POST'])
 def create_short_url(request):
-    csrf_token = request.META
-    print(csrf_token, '_______________________________')
     company = None
     title = None
     if 'url' in request.data:

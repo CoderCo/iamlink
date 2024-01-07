@@ -17,6 +17,8 @@
     <div class="mx-auto max-w-2xl text-center">
         <h1 class="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">Сократитель ссылок</h1>
         <p class="mt-2 text-lg leading-8 text-gray-600">
+            Короткие ссылки придают краткость и читаемость, упрощают процесс копирования и вставки для пользователей,
+            являются эффективными инструментами в сфере
             маркетинга.
         </p>
     </div>
@@ -79,11 +81,14 @@
         const formData = new FormData(form);
         // generate object to send to API endpoint
         const requestBody = {url: formData.get("url")};
+        console.log(requestBody, 'sssssssssssssssss requestBody')
         // make post request to API, don't forget the trailing slash!
+        let csrfToken = document.querySelector('meta[name="csrf-token"]').content;
         fetch("/url/", {
             method: "post",
             headers: {
                 "Content-Type": "application/json",
+                'X-CSRFToken': csrfToken,
             },
             body: JSON.stringify(requestBody),
         })
