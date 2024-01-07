@@ -28,7 +28,7 @@ if READ_DOT_ENV_FILE:
     env.read_env(str(BASE_DIR / ".env.dev"))
 
 SECRET_TOKEN = env.str("SECRET_TOKEN", default='1234567890gslhkhkhctww5x6x4ryxrytxrrxrryrdfghjkl')
-DEBUG = env.bool("DEBUG", default=True)
+DEBUG = env.bool("DEBUG", default=False)
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
@@ -69,7 +69,7 @@ MIDDLEWARE = [
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",
     "http://localhost:8000",
-    "https://iamlink-docker.onrender.com    "
+    "https://iamlink-docker.onrender.com"
     # Добавьте другие домены, если это необходимо
 ]
 
