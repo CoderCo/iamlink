@@ -1,3 +1,9 @@
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
+from rest_framework import status
+import json
+
+
 from django.core.serializers import serialize
 from django.http import HttpResponseNotFound
 from django.shortcuts import redirect, render
@@ -26,25 +32,30 @@ def redirect_original_url(request, hash):
 
 @csrf_exempt
 @api_view(['POST'])
-def create_short_url(request):
+def get_list_url(request):
     """
-        не проверяем наличие csrf token на фронте
+    all - все компании кроме None
     """
-    company = None
-    title = None
-    if 'url' in request.data:
-        original_url = request.data['url']
-        if 'company' in request.data:
-            company = request.data['company']
-        elif 'title' in request.data:
-            title = request.data['title']
-        # Generate a unique hash for the URL
-        hash_value = hashlib.md5(original_url.encode()).hexdigest()[:10]
-        # Create a new URL object in the database
-        URL.objects.create(hash=hash_value, url=original_url, company=company, title=title)
-        return JsonResponse({'shortened_url': f'/{hash_value}/'}, status=201)
-    return JsonResponse({'error': 'Invalid request data'}, status=400)
-    # return JsonResponse({'error': 'FORBIDDEN'}, status=403)
+    try:
+        list_data = request.data
+    except json.JSONDecodeError:
+        return Response({'error': 'Invalid JSON format in the request'}, status=status.HTTP_400_BAD_REQUEST)
+
+    if SECRET_TOKEN in list_data:
+        if 'company' in list_data and list_data['company'] != 'all':
+            # получаем сведения о конкретной компании
+            company = list_data['company']
+            list_company = URL.objects.filter(company=company)
+            list_company_json = list(list_company.values())
+            return Response({'list_company': list_company_json}, status=status.HTTP_200_OK)
+        elif list_data['company'] == 'all':
+            # получаем список всех наименований компаний
+            unique_companies = URL.objects.exclude(company__isnull=True).values_list('company', flat=True).distinct()
+            # Преобразуем в список и удаляем возможные значения None
+            filtered_companies = [company for company in unique_companies if company is not None]
+            return Response({'unique_companies': filtered_companies}, status=status.HTTP_200_OK)
+    return Response({'error': 'FORBIDDEN'}, status=status.HTTP_403_FORBIDDEN)
+
 
 @api_view(['POST'])
 def get_list_url(request):
