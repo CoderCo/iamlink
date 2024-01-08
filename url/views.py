@@ -9,21 +9,27 @@ from .serializers import URLSerializer
 from rest_framework.response import Response
 import json
 import environ
-from url_project.settings import SECRET_TOKEN
+from url_project.settings import SECRET_TOKEN, DEBUG
+from django.views.decorators.csrf import csrf_exempt
 
 def redirect_original_url(request, hash):
     try:
         url = URL.objects.get(hash=hash)
         url.visits += 1  # Increment visits count
         url.save()
-        return redirect(f'http://{url.url}')
+        if DEBUG:
+            return redirect(f'http://{url.url}')
+        return redirect(f'https://{url.url}')
     except URL.DoesNotExist:
         return HttpResponseNotFound("No Redirect")
 
 
-
+@csrf_exempt
 @api_view(['POST'])
 def create_short_url(request):
+    """
+        не проверяем наличие csrf token на фронте
+    """
     company = None
     title = None
     if 'url' in request.data:
@@ -93,5 +99,7 @@ def get_url_stats(request, hash):
         return Response({'error': 'Short URL not found'}, status=404)
     
 def simple_ui(request):
-    urls = URL.objects.all()
-    return render(request, "index.html", {"urls": urls})
+    # urls = URL.objects.all()
+    # return render(request, "index.html", {"urls": urls})
+    return JsonResponse({'FORBIDDEN': '403'}, status=200)
+
