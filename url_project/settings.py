@@ -71,6 +71,7 @@ CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",
     "http://localhost:8000",
     "https://iamlink-docker.onrender.com"
+    "https://iamlink.ru/"
     # Добавьте другие домены, если это необходимо
 ]
 
