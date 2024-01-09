@@ -38,7 +38,6 @@ def create_short_url(request):
     """
     company = None
     title = None
-    print(request.data, 'request.datarequest.datarequest.data')
     if 'url' in request.data:
         original_url = request.data['url']
         if 'company' in request.data:
@@ -47,13 +46,8 @@ def create_short_url(request):
             title = request.data['title']
         hash_value = hashlib.md5(original_url.encode()).hexdigest()[:10]
         new_url = URL.objects.get_or_create(hash=hash_value, url=original_url, company=company, title=title)[0]
-        response_data = {
-            'shortened_url': new_url.hash,
-            'url': new_url.url,
-            'company': new_url.company,
-            'title': new_url.title,
-        }
-        return Response(response_data, status=status.HTTP_200_OK)
+        serializer = URLSerializer(new_url)
+        return Response(serializer.data)
     return Response({'error': 'FORBIDDEN'}, status=status.HTTP_403_FORBIDDEN)
 
 
@@ -67,13 +61,8 @@ def get_list_url(request):
         if 'company' in request.data.keys() and request.data['company'] != 'all':
             company = request.data['company']
             new_url = URL.objects.get(company=company)
-            response_data = {
-                'shortened_url': new_url.hash,
-                'url': new_url.url,
-                'company': new_url.company,
-                'title': new_url.title,
-            }
-            return Response(response_data, status=status.HTTP_200_OK)
+            serializer = URLSerializer(new_url)
+            return Response(serializer.data)
         else:
             # получаем список всех наименований компаний
             unique_companies = URL.objects.exclude(company__isnull=True).values_list('company', flat=True).distinct()

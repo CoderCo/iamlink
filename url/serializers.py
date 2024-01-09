@@ -4,4 +4,4 @@ from .models import URL
 class URLSerializer(serializers.ModelSerializer):
     class Meta:
         model = URL
-        fields = ['hash', 'url', 'visits']
+        fields = ['hash', 'url', 'visits', 'company', 'title']
