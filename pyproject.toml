@@ -1,10 +1,10 @@
 [tool.poetry]
-name = "koyeb-django-url-shortner"
+name = "back-iamlink"
 version = "0.1.0"
 description = ""
-authors = ["coderco <coderpydj@gmail.com>"]
+authors = ["Dir <ooo_31@bk.ru>"]
 readme = "README.md"
-packages = [{include = "koyeb_django_url_shortner"}]
+packages = [{include = "back_iamlink"}]
 
 [tool.poetry.dependencies]
 python = "^3.10"
@@ -14,12 +14,12 @@ django = "4.2.7"
 djangorestframework = "3.14.0"
 gunicorn = "21.2.0"
 packaging = "23.2"
-psycopg2 = "2.9.9"
 pytz = "2023.3.post1"
 sqlparse = "0.4.4"
 typing-extensions = "4.8.0"
-django-environ = "^0.11.2"
-django-cors-headers = "^4.3.1"
+django-environ = "0.11.2"
+django-cors-headers = "4.3.1"
+whitenoise = {extras = ["brotli"], version = "^6.6.0"}
 
 
 [build-system]

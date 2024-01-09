@@ -41,26 +41,18 @@ def create_short_url(request):
 
     if 'url' in request.data:
         original_url = request.data['url']
-
         if 'company' in request.data:
             company = request.data['company']
         elif 'title' in request.data:
             title = request.data['title']
-
-        # Generate a unique hash for the URL
         hash_value = hashlib.md5(original_url.encode()).hexdigest()[:10]
-
-        # Create a new URL object in the database
         new_url = URL.objects.create(hash=hash_value, url=original_url, company=company, title=title)
-
-        # Return information about the created URL
         response_data = {
-            'hash': new_url.hash,
+            'shortened_url': new_url.hash,
             'url': new_url.url,
             'company': new_url.company,
             'title': new_url.title,
         }
-
         return Response(response_data, status=status.HTTP_200_OK)
 
     return Response({'error': 'FORBIDDEN'}, status=status.HTTP_403_FORBIDDEN)
@@ -72,40 +64,39 @@ def get_list_url(request):
     """
         all - все компании кроме None
     """
-    json_dumps = json.dumps(list(request.data.values()), indent=2)
-    list_data = json.loads(json_dumps)
-    if SECRET_TOKEN in list_data:
-        if 'company' in request.data and request.data['company'] != 'all':
-            # получаем сведения о конкретной компании
+    if SECRET_TOKEN in request.data.values():
+        if 'company' in request.data.keys() and request.data['company'] != 'all':
             company = request.data['company']
-            list_company = URL.objects.filter(company=company)
-            list_company = json.dumps(list(list_company.values()), indent=2)
-            list_company_json = json.loads(list_company)
-            return JsonResponse({'list_company': f'{list_company_json}'}, status=200)
-        elif request.data['company'] == 'all':
+            new_url = URL.objects.get(company=company)
+            response_data = {
+                'shortened_url': new_url.hash,
+                'url': new_url.url,
+                'company': new_url.company,
+                'title': new_url.title,
+            }
+            return Response(response_data, status=status.HTTP_200_OK)
+        else:
             # получаем список всех наименований компаний
             unique_companies = URL.objects.exclude(company__isnull=True).values_list('company', flat=True).distinct()
+            print(unique_companies, 'unique_companies')
             # Преобразуем в список и удаляем возможные значения None
             filtered_companies = [company for company in unique_companies if company is not None]
-            # Преобразуем список в JSON
-            json_data = json.dumps(filtered_companies, separators=(',', ':')).translate(str.maketrans('', '', '[]"'))
-            return JsonResponse({'unique_companies': f'{json_data}'}, status=200)
-    return JsonResponse({'error': 'FORBIDDEN'}, status=403)
-
+            response_data = {
+                'list_company': filtered_companies,
+            }
+            return Response(response_data, status=status.HTTP_200_OK)
+    return Response({'error': 'FORBIDDEN'}, status=status.HTTP_403_FORBIDDEN)
 
 @api_view(['POST'])
 def delete_url(request, hash):
-    json_dumps = json.dumps(list(request.data.values()), indent=2)
-    list_data = json.loads(json_dumps)
-    # hash = request.data['hash']
-    if SECRET_TOKEN in list_data:
+    if SECRET_TOKEN in request.data.values():
         try:
             url = URL.objects.get(hash=hash)
             url.delete()
-            return JsonResponse({'ok': f'delete{url}'}, status=200)
+            return Response('ok', status=status.HTTP_200_OK)
         except URL.DoesNotExist:
             return Response({'error': 'Short URL not found'}, status=404)
-    return JsonResponse({'error': 'FORBIDDEN'}, status=403)
+    return Response({'error': 'FORBIDDEN'}, status=status.HTTP_403_FORBIDDEN)
 
 @api_view(['GET'])
 def get_url_stats(request, hash):

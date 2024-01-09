@@ -70,10 +70,8 @@ MIDDLEWARE = [
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",
     "http://localhost:8000",
-    "https://iamlink-docker.onrender.com",
-    "https://iamlink.ru/",
-    "https://l.iamlink.ru/url/"
-    # Добавьте другие домены, если это необходимо
+    "https://iamlink.ru",
+    "https://l.iamlink.ru"
 ]
 
 CORS_ALLOW_METHODS = (
