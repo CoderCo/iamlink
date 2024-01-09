@@ -29,8 +29,6 @@ def redirect_original_url(request, hash):
     except URL.DoesNotExist:
         return Response({'error': 'FORBIDDEN'}, status=status.HTTP_403_FORBIDDEN)
 
-
-@csrf_exempt
 @api_view(['POST'])
 def create_short_url(request):
     """
