@@ -1,7 +1,7 @@
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, renderer_classes
 from rest_framework.response import Response
-from rest_framework import status
-
+from rest_framework import status, generics
+from rest_framework.renderers import JSONRenderer
 
 from django.core.serializers import serialize
 from django.http import HttpResponseNotFound
@@ -24,6 +24,7 @@ def redirect_original_url(request, hash):
         return Response({'error': 'FORBIDDEN'}, status=status.HTTP_403_FORBIDDEN)
 
 @api_view(['POST'])
+@renderer_classes([JSONRenderer])
 def create_short_url(request):
     """
     не проверяем наличие csrf token на фронте
@@ -41,11 +42,10 @@ def create_short_url(request):
             new_url = URL.objects.get_or_create(hash=hash_value, url=original_url, company=company, title=title)[0]
             serializer = URLSerializer(new_url)
             return Response(serializer.data)
-    return Response({'error': 'FORBIDDEN'}, status=status.HTTP_403_FORBIDDEN)
-
 
 
 @api_view(['POST'])
+@renderer_classes([JSONRenderer])
 def get_list_url(request):
     """
         all - все компании кроме None
@@ -67,9 +67,9 @@ def get_list_url(request):
                     'list_company': filtered_companies,
                 }
                 return Response(response_data, status=status.HTTP_200_OK)
-    return Response({'error': 'FORBIDDEN'}, status=status.HTTP_403_FORBIDDEN)
 
 @api_view(['POST'])
+@renderer_classes([JSONRenderer])
 def delete_url(request, hash):
     if request.method == 'POST':
         if SECRET_TOKEN in request.data.values():
@@ -79,9 +79,9 @@ def delete_url(request, hash):
                 return Response('ok', status=status.HTTP_200_OK)
             except URL.DoesNotExist:
                 return Response({'error': 'Short URL not found'}, status=404)
-    return Response({'error': 'FORBIDDEN'}, status=status.HTTP_403_FORBIDDEN)
 
 @api_view(['POST'])
+@renderer_classes([JSONRenderer])
 def get_url_stats(request, hash):
     """
         статистика по hash
@@ -93,7 +93,6 @@ def get_url_stats(request, hash):
             return Response(serializer.data)
         except URL.DoesNotExist:
             return Response({'error': 'Short URL not found'}, status=404)
-    return Response({'error': 'FORBIDDEN'}, status=status.HTTP_403_FORBIDDEN)
     
 def simple_ui(request):
     # urls = URL.objects.all()
