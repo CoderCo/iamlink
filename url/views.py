@@ -27,7 +27,7 @@ def redirect_original_url(request, hash):
             return redirect(f'http://{url.url}')
         return redirect(f'https://{url.url}')
     except URL.DoesNotExist:
-        return HttpResponseNotFound("No Redirect")
+        return Response({'error': 'FORBIDDEN'}, status=status.HTTP_403_FORBIDDEN)
 
 
 @csrf_exempt
