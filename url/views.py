@@ -38,7 +38,7 @@ def create_short_url(request):
     """
     company = None
     title = None
-
+    print(request.data, 'request.datarequest.datarequest.data')
     if 'url' in request.data:
         original_url = request.data['url']
         if 'company' in request.data:
@@ -46,7 +46,7 @@ def create_short_url(request):
         elif 'title' in request.data:
             title = request.data['title']
         hash_value = hashlib.md5(original_url.encode()).hexdigest()[:10]
-        new_url = URL.objects.create(hash=hash_value, url=original_url, company=company, title=title)
+        new_url = URL.objects.get_or_create(hash=hash_value, url=original_url, company=company, title=title)[0]
         response_data = {
             'shortened_url': new_url.hash,
             'url': new_url.url,
@@ -54,7 +54,6 @@ def create_short_url(request):
             'title': new_url.title,
         }
         return Response(response_data, status=status.HTTP_200_OK)
-
     return Response({'error': 'FORBIDDEN'}, status=status.HTTP_403_FORBIDDEN)
 
 
