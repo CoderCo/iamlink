@@ -29,7 +29,6 @@ from rest_framework.response import Response
 from rest_framework import status
 import hashlib
 
-@csrf_exempt
 @api_view(['POST'])
 def create_short_url(request):
     """
@@ -58,7 +57,6 @@ def create_short_url(request):
 
 
 
-@csrf_exempt
 @api_view(['POST'])
 def get_list_url(request):
     """
@@ -82,7 +80,6 @@ def get_list_url(request):
         else:
             return Response({"error": "Invalid or missing token"}, status=status.HTTP_403_FORBIDDEN)
 
-@csrf_exempt
 @api_view(['POST'])
 def delete_url(request, hash):
     if request.method == 'POST':
@@ -94,7 +91,6 @@ def delete_url(request, hash):
             except URL.DoesNotExist:
                 return Response({'error': 'Short URL not found'}, status=404)
 
-@csrf_exempt
 @api_view(['POST'])
 def get_url_stats(request, hash):
     """
@@ -110,6 +106,6 @@ def get_url_stats(request, hash):
     
 def simple_ui(request):
     urls = URL.objects.all()
-    return render(request, "index.html", {"urls": urls})
-    # return JsonResponse({'FORBIDDEN': '403'}, status=200)
+    # return render(request, "index.html", {"urls": urls})
+    return JsonResponse({'FORBIDDEN': '403'}, status=200)
 
