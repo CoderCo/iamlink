@@ -13,6 +13,7 @@ import hashlib
 from .serializers import URLSerializer
 from url_project.settings import SECRET_TOKEN, DEBUG
 
+
 def redirect_original_url(request, hash):
     try:
         url = URL.objects.get(hash=hash)
@@ -40,7 +41,9 @@ def create_short_url(request):
 
         try:
             hash_value = hashlib.sha256(original_url.encode()).hexdigest()[:10]
-            new_url, created = URL.objects.get_or_create(hash=hash_value, defaults={'url': original_url, 'company': company, 'title': title})
+            new_url, created = URL.objects.get_or_create(hash=hash_value,
+                                                         defaults={'url': original_url, 'company': company,
+                                                                   'title': title})
             if not created:
                 return Response({'message': 'URL already exists.', 'hash': hash_value}, status=status.HTTP_409_CONFLICT)
 
@@ -50,7 +53,6 @@ def create_short_url(request):
             return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
     return Response({'error': 'Invalid request method.'}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
-
 
 
 @api_view(['POST'])
@@ -70,11 +72,13 @@ def get_list_url(request):
                     return Response({"error": "Company not found"}, status=status.HTTP_404_NOT_FOUND)
             else:
                 # получаем список всех наименований компаний
-                unique_companies = URL.objects.exclude(company__isnull=True).values_list('company', flat=True).distinct()
+                unique_companies = URL.objects.exclude(company__isnull=True).values_list('company',
+                                                                                         flat=True).distinct()
                 filtered_companies = [company for company in unique_companies if company is not None]
                 return Response({'list_company': filtered_companies}, status=status.HTTP_200_OK)
         else:
             return Response({"error": "Invalid or missing token"}, status=status.HTTP_403_FORBIDDEN)
+
 
 @api_view(['POST'])
 def delete_url(request, hash):
@@ -87,14 +91,15 @@ def delete_url(request, hash):
             except URL.DoesNotExist:
                 return Response({'error': 'Short URL not found'}, status=404)
 
+
+@csrf_exempt
 @api_view(['POST'])
-def delete_company(request):
+def delete_company(request, company):
     if request.method == 'POST':
-        company = request.data['company']
+        company = request.data.get('company')
         if SECRET_TOKEN in request.data.values() and company:
             try:
-                url = URL.objects.get(company=company)
-                url.delete()
+                url = URL.objects.filter(company=company).delete()
                 return Response('ok', status=status.HTTP_200_OK)
             except URL.DoesNotExist:
                 return Response({'error': 'company not allowed'}, status=404)
@@ -126,9 +131,9 @@ def get_url_stats(request, hash):
             return Response(serializer.data)
         except URL.DoesNotExist:
             return Response({'error': 'Short URL not found'}, status=404)
-    
+
+
 def simple_ui(request):
     urls = URL.objects.all()
-    # return render(request, "index.html", {"urls": urls})
-    return JsonResponse({'FORBIDDEN': '403'}, status=200)
-
+    return render(request, "index.html", {"urls": urls})
+    # return JsonResponse({'FORBIDDEN': '403'}, status=200)
