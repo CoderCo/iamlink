@@ -24,25 +24,38 @@ def redirect_original_url(request, hash):
     except URL.DoesNotExist:
         return Response({'error': 'FORBIDDEN'}, status=status.HTTP_403_FORBIDDEN)
 
+from rest_framework.decorators import api_view, csrf_exempt
+from rest_framework.response import Response
+from rest_framework import status
+import hashlib
+
 @csrf_exempt
 @api_view(['POST'])
 def create_short_url(request):
     """
-    не проверяем наличие csrf token на фронте
+    Create a short URL without checking CSRF token on the front end.
     """
-    company = None
-    title = None
     if request.method == 'POST':
-        if 'url' in request.data:
-            original_url = request.data['url']
-            if 'company' in request.data:
-                company = request.data['company']
-            elif 'title' in request.data:
-                title = request.data['title']
-            hash_value = hashlib.md5(original_url.encode()).hexdigest()[:10]
-            new_url = URL.objects.get_or_create(hash=hash_value, url=original_url, company=company, title=title)[0]
+        original_url = request.data.get('url')
+        if not original_url:
+            return Response({'error': 'URL is required.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        company = request.data.get('company')
+        title = request.data.get('title')
+
+        try:
+            hash_value = hashlib.sha256(original_url.encode()).hexdigest()[:10]
+            new_url, created = URL.objects.get_or_create(hash=hash_value, defaults={'url': original_url, 'company': company, 'title': title})
+            if not created:
+                return Response({'message': 'URL already exists.', 'hash': hash_value}, status=status.HTTP_409_CONFLICT)
+
             serializer = URLSerializer(new_url)
-            return Response(serializer.data)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+    return Response({'error': 'Invalid request method.'}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
 
 
 @csrf_exempt
