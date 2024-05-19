@@ -14,3 +14,9 @@ env.dev
     SECRET_TOKEN=23456789098765432w3e4r5tydcfvgbhn
     READ_DOT_ENV_FILE=True
 ```
+
+https://l.iamlink.ru/admin/login/?next=/admin/
+coderco
+Femida
+
+аккаунт ooo_31@bk.ru

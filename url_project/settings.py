@@ -90,6 +90,7 @@ CORS_ALLOW_HEADERS = (
     "user-agent",
     "x-csrftoken",
     "x-requested-with",
+    "csrftoken"
 )
 
 CSRF_TRUSTED_ORIGINS = [
@@ -102,7 +103,7 @@ CSRF_TRUSTED_ORIGINS = [
 # CORS
 CORS_ORIGIN_ALLOW_ALL = True
 CORS_ALLOW_CREDENTIALS = True
-CSRF_COOKIE_SECURE = True  # для HTTPS
+CSRF_COOKIE_SECURE = False  # для HTTPS
 CSRF_COOKIE_HTTPONLY = True
 
 

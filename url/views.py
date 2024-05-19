@@ -1,3 +1,4 @@
+from django.views.decorators.csrf import csrf_exempt
 from rest_framework.decorators import api_view, renderer_classes
 from rest_framework.response import Response
 from rest_framework import status, generics
@@ -23,8 +24,8 @@ def redirect_original_url(request, hash):
     except URL.DoesNotExist:
         return Response({'error': 'FORBIDDEN'}, status=status.HTTP_403_FORBIDDEN)
 
+@csrf_exempt
 @api_view(['POST'])
-@renderer_classes([JSONRenderer])
 def create_short_url(request):
     """
     не проверяем наличие csrf token на фронте
@@ -44,32 +45,32 @@ def create_short_url(request):
             return Response(serializer.data)
 
 
+@csrf_exempt
 @api_view(['POST'])
-@renderer_classes([JSONRenderer])
 def get_list_url(request):
     """
-        all - все компании кроме None
+    all - все компании кроме None
     """
     if request.method == 'POST':
-        if SECRET_TOKEN in request.data.values():
-            if 'company' in request.data.keys() and request.data['company'] != 'all':
+        if 'SECRET_TOKEN' in request.data and request.data['SECRET_TOKEN'] == '23456789098765432w3e4r5tydcfvgbhn':
+            if 'company' in request.data and request.data['company'] != 'all':
                 company = request.data['company']
-                new_url = URL.objects.get(company=company)
-                serializer = URLSerializer(new_url)
-                return Response(serializer.data)
+                try:
+                    new_url = URL.objects.get(company=company)
+                    serializer = URLSerializer(new_url)
+                    return Response(serializer.data)
+                except URL.DoesNotExist:
+                    return Response({"error": "Company not found"}, status=status.HTTP_404_NOT_FOUND)
             else:
                 # получаем список всех наименований компаний
                 unique_companies = URL.objects.exclude(company__isnull=True).values_list('company', flat=True).distinct()
-                print(unique_companies, 'unique_companies')
-                # Преобразуем в список и удаляем возможные значения None
                 filtered_companies = [company for company in unique_companies if company is not None]
-                response_data = {
-                    'list_company': filtered_companies,
-                }
-                return Response(response_data, status=status.HTTP_200_OK)
+                return Response({'list_company': filtered_companies}, status=status.HTTP_200_OK)
+        else:
+            return Response({"error": "Invalid or missing token"}, status=status.HTTP_403_FORBIDDEN)
 
+@csrf_exempt
 @api_view(['POST'])
-@renderer_classes([JSONRenderer])
 def delete_url(request, hash):
     if request.method == 'POST':
         if SECRET_TOKEN in request.data.values():
@@ -80,8 +81,8 @@ def delete_url(request, hash):
             except URL.DoesNotExist:
                 return Response({'error': 'Short URL not found'}, status=404)
 
+@csrf_exempt
 @api_view(['POST'])
-@renderer_classes([JSONRenderer])
 def get_url_stats(request, hash):
     """
         статистика по hash
@@ -95,7 +96,7 @@ def get_url_stats(request, hash):
             return Response({'error': 'Short URL not found'}, status=404)
     
 def simple_ui(request):
-    # urls = URL.objects.all()
-    # return render(request, "index.html", {"urls": urls})
-    return JsonResponse({'FORBIDDEN': '403'}, status=200)
+    urls = URL.objects.all()
+    return render(request, "index.html", {"urls": urls})
+    # return JsonResponse({'FORBIDDEN': '403'}, status=200)
 

@@ -4,7 +4,6 @@ version = "0.1.0"
 description = ""
 authors = ["Dir <ooo_31@bk.ru>"]
 readme = "README.md"
-packages = [{include = "back_iamlink"}]
 
 [tool.poetry.dependencies]
 python = "^3.10"
