@@ -24,10 +24,6 @@ def redirect_original_url(request, hash):
     except URL.DoesNotExist:
         return Response({'error': 'FORBIDDEN'}, status=status.HTTP_403_FORBIDDEN)
 
-from rest_framework.decorators import api_view, csrf_exempt
-from rest_framework.response import Response
-from rest_framework import status
-import hashlib
 
 @api_view(['POST'])
 def create_short_url(request):
