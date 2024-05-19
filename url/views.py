@@ -88,13 +88,28 @@ def delete_url(request, hash):
                 return Response({'error': 'Short URL not found'}, status=404)
 
 @api_view(['POST'])
-def delete_company(request, company):
+def delete_company(request):
     if request.method == 'POST':
-        if SECRET_TOKEN in request.data.values():
+        company = request.data['company']
+        if SECRET_TOKEN in request.data.values() and company:
             try:
                 url = URL.objects.get(company=company)
                 url.delete()
                 return Response('ok', status=status.HTTP_200_OK)
+            except URL.DoesNotExist:
+                return Response({'error': 'company not allowed'}, status=404)
+
+
+@api_view(['POST'])
+def all_company_urls(request, company):
+    if request.method == 'POST':
+        if SECRET_TOKEN in request.data.values():
+            try:
+                new_url = URL.objects.filter(company=company)
+                serializer = URLSerializer(new_url)
+                return Response(serializer.data)
+            except URL.DoesNotExist:
+                return Response({"error": "Company not found"}, status=status.HTTP_404_NOT_FOUND)
             except URL.DoesNotExist:
                 return Response({'error': 'Short URL not found'}, status=404)
 
