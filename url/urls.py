@@ -7,4 +7,5 @@ urlpatterns = [
     path('url/stats/<str:hash>/', views.get_url_stats),
     path('url/list/123/', views.get_list_url),
     path('url/delete/<str:hash>/', views.delete_url),
+    path('url/delete-comp/<str:hash>/', views.delete_company),
 ]

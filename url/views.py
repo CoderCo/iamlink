@@ -88,6 +88,18 @@ def delete_url(request, hash):
                 return Response({'error': 'Short URL not found'}, status=404)
 
 @api_view(['POST'])
+def delete_company(request, company):
+    if request.method == 'POST':
+        if SECRET_TOKEN in request.data.values():
+            try:
+                url = URL.objects.get(company=company)
+                url.delete()
+                return Response('ok', status=status.HTTP_200_OK)
+            except URL.DoesNotExist:
+                return Response({'error': 'Short URL not found'}, status=404)
+
+
+@api_view(['POST'])
 def get_url_stats(request, hash):
     """
         статистика по hash
