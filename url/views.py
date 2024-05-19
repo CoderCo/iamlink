@@ -35,7 +35,7 @@ def create_short_url(request):
         if not original_url:
             return Response({'error': 'URL is required.'}, status=status.HTTP_400_BAD_REQUEST)
 
-        company = request.data.get('company')
+        company = original_url.split('.')[0]
         title = request.data.get('title')
 
         try:
